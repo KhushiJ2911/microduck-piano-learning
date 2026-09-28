@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+runs/
+vendor/
+.venv/
+.pytest_cache/
+.mplconfig/
+*.log
+MUJOCO_LOG.TXT
+:memory:.ses

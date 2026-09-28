@@ -1,0 +1,42 @@
+<mujoco model="microduck_piano_keys">
+    <!--
+      Two physical, spring-loaded piano keys for the first learning task.
+      Each white/black key is a 30 g body on a downward slide.  The slide is
+      deliberately passive: a MicroDuck foot supplies the force, a MuJoCo
+      joint spring returns the key, and the task reads its actual travel.  No
+      invisible actuator or reward-side "press" is used.
+
+      The robot faces +x (audience-facing convention); the two adjacent keys
+      sit ahead of its stance, separated along its left/right y axis.
+    -->
+    <compiler angle="radian" autolimits="true"/>
+    <worldbody>
+        <body name="piano_keys" pos="0 0 0">
+            <!-- The top of each unpressed key is z=12 mm. Positive travel is
+                 DOWN because the slide axis is -z; range is a piano-like 6 mm.
+                 k * travel = 4.2 N at end stop, enough to reject light grazes
+                 while staying well within a small foot press. -->
+            <!-- At full travel the underside remains 2 mm above the terrain,
+                 so the floor cannot masquerade as a foot press. -->
+            <body name="piano_key_left_body" pos="0.070 0.042 0.010">
+                <joint name="piano_key_left_slide" type="slide" axis="0 0 -1"
+                       range="0 0.006" stiffness="700" damping="2.0"/>
+                <geom name="piano_key_left" type="box" size="0.032 0.038 0.002"
+                      mass="0.030" rgba="0.96 0.96 0.92 1"
+                      friction="1.0 0.005 0.0001"/>
+                <!-- This site moves with the key and remains an XY aim point. -->
+                <site name="piano_key_left_target" pos="0 0 0.002"
+                      type="sphere" size="0.002" rgba="0.2 0.8 0.3 0.35"/>
+            </body>
+            <body name="piano_key_right_body" pos="0.070 -0.042 0.010">
+                <joint name="piano_key_right_slide" type="slide" axis="0 0 -1"
+                       range="0 0.006" stiffness="700" damping="2.0"/>
+                <geom name="piano_key_right" type="box" size="0.032 0.038 0.002"
+                      mass="0.030" rgba="0.14 0.14 0.16 1"
+                      friction="1.0 0.005 0.0001"/>
+                <site name="piano_key_right_target" pos="0 0 0.002"
+                      type="sphere" size="0.002" rgba="0.2 0.8 0.3 0.35"/>
+            </body>
+        </body>
+    </worldbody>
+</mujoco>
