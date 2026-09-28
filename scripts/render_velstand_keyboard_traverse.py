@@ -121,19 +121,23 @@ def build_cfg(
     from mjlab.envs.mdp.actions import JointPositionActionCfg
     from mjlab.managers.scene_entity_config import SceneEntityCfg
     from mjlab.sensor import ContactMatch, ContactSensorCfg
-    from mjlab_microduck.tasks.microduck_velstand_env_cfg import (
-        make_microduck_velstand_env_cfg,
+    from mjlab_microduck.robot.microduck_constants import (
+        MICRODUCK_STANDUP_ROBOT_CFG,
+    )
+    from mjlab_microduck.tasks.microduck_velocity_env_cfg import (
+        make_microduck_velocity_env_cfg,
     )
 
-    # Begin from the exact public actor's official task, then duplicate its
-    # robot/action/observation contracts.  This keeps the repository evaluator
+    # Begin from the official 61-D locomotion interface, then duplicate its
+    # action/observation contracts around the same ground-contact robot model
+    # used in the audited piano rollout. This keeps the repository evaluator
     # independent of the exploratory piano training modules used during R&D.
-    cfg = make_microduck_velstand_env_cfg(play=True)
+    cfg = make_microduck_velocity_env_cfg(play=True)
     cfg.scene.num_envs = num_envs
     cfg.seed = seed
     cfg.scene.env_spacing = 0.0
 
-    robot_template = deepcopy(cfg.scene.entities["robot"])
+    robot_template = deepcopy(MICRODUCK_STANDUP_ROBOT_CFG)
     cfg.scene.entities = {
         "duck0": deepcopy(robot_template),
         "duck1": deepcopy(robot_template),
@@ -168,7 +172,9 @@ def build_cfg(
     for duck_index in range(2):
         base = deepcopy(reset_base)
         base.params["asset_cfg"] = SceneEntityCfg(f"duck{duck_index}")
+        base.params["pose_range"]["x"] = (0.0, 0.0)
         base.params["pose_range"]["y"] = ((-0.168, 0.168)[duck_index],) * 2
+        base.params["pose_range"]["yaw"] = (0.0, 0.0)
         cfg.events[f"reset_duck{duck_index}_base"] = base
         joints = deepcopy(reset_joints)
         joints.params["asset_cfg"] = SceneEntityCfg(
